@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router"
 import { fetchCoinData } from "../api/coinGecko";
 import { useEffect, useState } from "react";
+import { formatPrice } from "../utils/formatter";
 
 
 export const CoinDetail = () => { 
@@ -46,6 +47,10 @@ export const CoinDetail = () => {
       </div>
     );
   }
+
+  const priceChange= coin.market_data.price_change_percentage_24h || 0;
+  const isPositive= priceChange >=0;
+
   return (
     <div className="app">
 
@@ -56,9 +61,42 @@ export const CoinDetail = () => {
                     <p>Cryptocurrency market data and prices in real-time.</p>
                 </div>
                 <button className="not-found" onClick={() => navigate("/")}>⬅ Go Back</button>
-                
             </div>
         </header>
+
+        <div className="coin-detail">
+          <div className="coin-header">
+            <div className="coin-title">
+              <img src={coin.image.large} alt={coin.name} />
+              <div>
+                <h1>{coin.name}</h1>
+                <p className="symbol"> {coin.symbol.toUpperCase()} </p>
+              </div>
+            </div>
+            <span className="rank">Rank # {coin.market_data.market_cap_rank} </span>
+          </div>
+
+          <div className="coin-price-section">
+            <div className="current-price">
+              <h2> {formatPrice(coin.market_data.current_price.usd)} </h2>
+              <span className={`change-badge ${isPositive ? "positive" : "negative"} `}> 
+                  {isPositive ? "⬆  " : "⬇  "}
+                  {Math.abs(priceChange).toFixed(2)}% 
+              </span>
+            </div>
+
+            <div className="price-ranges">
+              <div className="price-range">
+                <span className="range-label">24h High</span>
+                <span className="range-value"> {formatPrice(coin.market_data.high_24h.usd)} </span>
+              </div>
+              <div className="price-range">
+                <span className="range-label">24h Low</span>
+                <span className="range-value"> {formatPrice(coin.market_data.low_24h.usd)} </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
   )
 }
